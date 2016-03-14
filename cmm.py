@@ -40,18 +40,20 @@ def getImage(detail):
         cnt = 0   
     os.chdir(picpath)  
     path = os.getcwd()
-    print path
+    #print path
     for x in os.listdir(path):
-        cnt += 1 
+        cnt += 1
+    #print num 
     while(1):
         imgurl = 'http://img1.mm131.com/pic/'+detail[0]+'/'+str(cnt)+'.jpg'
-        print imgurl
+        #print imgurl
+        print cnt
         id = urllib.urlopen(imgurl).code
  	if(id==404):
 	    break
         name = '%s.jpg' % cnt       
         target = picpath+"\\%s.jpg" % cnt
-        print "The photos location is:"+target
+        #print "The photos location is:"+target
 	if os.path.exists(name):
 	    time.sleep(1)
             cnt += 1
@@ -59,11 +61,11 @@ def getImage(detail):
 	    continue
         download_img = urllib.urlretrieve(imgurl,'%s.jpg' % cnt)#将图片下载到指定
         time.sleep(10)
-        print(imgurl)
+        #print(imgurl)
         cnt += 1
     path = os.getcwd()
     parent_path = os.path.dirname(path)
-    print parent_path
+    #print parent_path
     os.chdir(parent_path)
 
 if __name__ == '__main__':
@@ -72,23 +74,37 @@ if __name__ == '__main__':
             **      Created on 2016-3-10              **
             **      @author: KeepMoves                **
             *****************************************'''
+    txtlog = 'Log.txt'
+    fLog = open(txtlog,'a')
+    pathRoot = os.getcwd()
+    pageCnt = 0;
+    for x in os.listdir(pathRoot):
+        pageCnt += 1
+    pageCnt = pageCnt - 9 
+    print pageCnt
     for page in range(1,66):
+        if (page == 1):
+	    html = 'http://www.mm131.com/xinggan/'
+	else:
+            html = 'http://www.mm131.com/xinggan/list_6_'+str(page)+'.html'
+        if(page<pageCnt):
+            page += 1
+            continue
         os.chdir('/home/keepmoves/MM')
         path = os.getcwd()
-        txt = 'log.txt'
-        fLog = open(txt,'a')
+        #print path
         picpath = 'sexPage'+str(page)
         if not os.path.exists(picpath):
             cnt = 1
             os.makedirs(picpath)
         else:
             cnt = 0   
-        os.chdir(picpath)  
-        if (page == 1):
-	    html = 'http://www.mm131.com/xinggan/'
-	else:
-            html = 'http://www.mm131.com/xinggan/list_6_'+str(page)+'.html'
-        print html
+        os.chdir(picpath)
+        pagePath = os.getcwd()
+        numInPages = 0
+        for x in os.listdir(pagePath):
+            numInPages += 1  
+        #print html
         fLog.write(html)
         fLog.write('\n')
         fLog.write(time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time())))
@@ -97,9 +113,17 @@ if __name__ == '__main__':
         detllst = findUrl2(html)
         numInPage = 1
         for detail in detllst:
+            if(numInPage < numInPages):
+                numInPage += 1
+                continue
+            pos = 'Page:\t' +str(page)+'/65'+ '\tNo:\t' + str(numInPage)+'/20'
+            print pos
+            print detail[1]
             fLog.write(str(numInPage))
+            fLog.write(detail[1])
+            numInPage += 1
             fLog.write('\n')
             #print detail[0],detail[1]
 	    imageList = getImage(detail)
-            numInPage += 1
     print "Finished."
+
